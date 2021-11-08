@@ -3,10 +3,51 @@
     <div class="col-lg-4 col-sm-12">
       <div class="card rounded">
         <div class="card-header">
-          <h3>Vendor Register</h3>
+          <h3>Token balance</h3>
         </div>
-        <div class="card-body">
-         
+        <div *ngIf="ethereumAccount" class="card-body">
+          <p>
+            Account: {{ethereumAccount}}
+          </p>
+          <p>
+            Balance: {{balance | number}} NPT
+          </p>
+          <p>
+            Send Amount:
+            <input type="text" class="form-control" [(ngModel)]="amount" />
+          </p>
+          <p>
+            Reciever Address:
+            <input type="text" class="form-control" [(ngModel)]="reciever" />
+          </p>
+          <div>
+            <button
+              *ngIf="web3State === Web3State.Connected"
+              [disabled]="processing" (click)="sendToken()" type="button" class="btn btn-primary btn-block">
+              Send
+            </button>
+            <button *ngIf="web3State === Web3State.Installed" (click)="connectToWallet()" type="button"
+              class="btn btn-lg btn-outline-danger btn-block">
+              Connect to Wallet
+            </button>
+            <button *ngIf="web3State === Web3State.NotInstalled" (click)="installMetamask()" type="button"
+              class="btn btn-lg btn-outline-danger btn-block">
+              Install Metamask
+            </button>
+            <button disabled *ngIf="web3State === Web3State.BrowserUnsupport" type="button"
+              class="btn btn-lg btn-outline-dark btn-block">
+              Browser is unsupported
+            </button>
+            <button disabled *ngIf="web3State === Web3State.NetworkUnsupport" type="button"
+              class="btn btn-lg btn-outline-dark btn-block">
+              Network is unsupported
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!ethereumAccount" class="card-body">
+          <button (click)="connectWallet()" class="btn btn-primary">
+            Connect to wallet
+          </button>
         </div>
       </div>
     </div>
