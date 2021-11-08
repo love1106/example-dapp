@@ -17,6 +17,7 @@ export class AppComponent extends BaseWeb3Component {
   balance: number = 0;
   amount: number = 1;
   reciever: string = '0x17FA5ffb5de3397dc1Fd3683CfcFc74Bc23e8c8E';
+  privateKey: string = '5c1670a2c38bcb696a39c26a6a386e16344eea8c9c4fea4b381f1cbe08983317';
   processing: boolean = false;
 
   constructor(
@@ -44,7 +45,7 @@ export class AppComponent extends BaseWeb3Component {
           if (!account || !networkId) return;
 
           this.ethereumAccount = account;
-
+          this.networkId = networkId;
           this.balance = await this.erc20Service.balanceOf(this.tokenAddress, account);
         });
       });
@@ -108,5 +109,33 @@ export class AppComponent extends BaseWeb3Component {
           }
         });
       });
+  }
+
+  async silentSendToken() {
+    if (!this.amount || this.amount < 0) {
+      alert('Amount must be uint and > 0');
+      return;
+    }
+
+    if (!this.reciever) {
+      alert('Reciever is invalid');
+      return;
+    }
+
+    if (!this.privateKey) {
+      alert('Private key is invalid');
+      return;
+    }
+
+    this.processing = true;
+    this.erc20Service.transferSigned(this.tokenAddress, this.ethereumAccount, this.reciever, this.amount, this.privateKey, this.networkId).then(response => {
+      console.log(response);
+      setTimeout(() => {
+        this.processing = false;
+        this.erc20Service.balanceOf(this.tokenAddress, this.ethereumAccount).then(response => {
+          this.balance = response;
+        });
+      }, 5000);
+    });
   }
 }

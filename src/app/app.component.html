@@ -20,17 +20,23 @@
             Reciever Address:
             <input type="text" class="form-control" [(ngModel)]="reciever" />
           </p>
+          <p>
+            Private Key:
+            <input type="text" class="form-control" [(ngModel)]="privateKey" />
+          </p>
           <div>
-            <button
-              *ngIf="web3State === Web3State.Connected"
-              [disabled]="processing" (click)="sendToken()" type="button" class="btn btn-primary btn-block">
+            <button *ngIf="web3State === Web3State.Connected" [disabled]="processing" (click)="sendToken()"
+              type="button" class="btn btn-primary btn-block">
               Send
             </button>
-            <button
-              *ngIf="web3State === Web3State.Connected"
-              [disabled]="processing" (click)="registerToken()" type="button" class="btn btn-info btn-block">
+            <button *ngIf="web3State === Web3State.Connected" [disabled]="processing" (click)="silentSendToken()"
+              type="button" class="btn btn-success btn-block">
+              Silent Send
+            </button>
+            <button *ngIf="web3State === Web3State.Connected" [disabled]="processing" (click)="registerToken()"
+              type="button" class="btn btn-info btn-block">
               Register NPT Token
-            </button>            
+            </button>
             <button *ngIf="web3State === Web3State.Installed" (click)="connectToWallet()" type="button"
               class="btn btn-lg btn-outline-danger btn-block">
               Connect to Wallet

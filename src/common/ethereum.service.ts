@@ -1,11 +1,14 @@
 import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { CommonService } from './common.service';
 import { NetworkRepository } from './network.repository';
 import { RegisterTokenRequest } from './registerTokenRequest';
 import { TransactionEvent, TransactionEventType } from './transaction-event';
 import { Web3State } from './web3-state';
 const Web3 = require('web3');
+const EthereumTx = require('ethereumjs-tx').Transaction;
+const ethereumjs_common = require('ethereumjs-common').default;
 
 @Injectable({ providedIn: 'root' })
 export class EthereumService {
@@ -122,6 +125,46 @@ export class EthereumService {
       });
 
     return subject.asObservable();
+  }
+
+  async sendSignedTransactionByMethodWithEvent(sender: string, reciever: string, method: any, privateKey: string, networkId: number): Promise<any> {
+    const appWeb3 = this.appWeb3;
+    const gasPrice = await appWeb3.eth.getGasPrice();
+    const nonce = await appWeb3.eth.getTransactionCount(sender);
+    const gasLimit = await method.estimateGas({ from: sender });
+    const encodedABI = method.encodeABI();
+
+    const rawTransaction = {
+      gasPrice: appWeb3.utils.toHex(gasPrice),
+      gasLimit: appWeb3.utils.toHex(gasLimit),
+      data: encodedABI,
+      value: '0x00',
+      nonce: appWeb3.utils.toHex(nonce),
+      to: reciever
+    };
+
+    var senderPrivateKeyHex = Buffer.from(privateKey, 'hex');
+
+    const common = ethereumjs_common.forCustomChain('mainnet', {
+      name: 'bnb',
+      networkId: networkId,
+      chainId: networkId
+    }, 'petersburg');
+
+    var transaction = new EthereumTx(rawTransaction, { "common": common });
+    transaction.sign(senderPrivateKeyHex);
+
+    const serializedTransaction = transaction.serialize();
+
+    return appWeb3.eth.sendSignedTransaction('0x' + serializedTransaction.toString('hex'), (err, hash) => {
+      if (err) {
+        Promise.reject(err);
+        return;
+      }
+
+      // Log the tx, you can explore status manually with eth.getTransaction()
+      Promise.resolve(hash);
+    });
   }
 
   public get appWeb3() {

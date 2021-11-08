@@ -40,13 +40,19 @@ export class Erc20Service {
 
   transfer(ercTokenAddress: string, owner: string, receiver: string, amount: number): Promise<Observable<TransactionEvent>> {
     const appWeb3 = this.ethereumService.appWeb3;
-    console.log(appWeb3.utils.toWei(amount.toString()));
     const contract = new appWeb3.eth.Contract(minERC20ABI, ercTokenAddress);
     const method = contract.methods.transfer(receiver, appWeb3.utils.toWei(amount.toString()));
     return this.ethereumService.sendTransactionByMethodWithEvent(owner, method);
   }
 
-  mintForMe(senderAddress: string, erc20Address: string, amount: number): Promise<Observable<TransactionEvent>> {
+  transferSigned(ercTokenAddress: string, owner: string, receiver: string, amount: number, privateKey: string, networkId: number): Promise<Observable<TransactionEvent>> {
+    const appWeb3 = this.ethereumService.appWeb3;
+    const contract = new appWeb3.eth.Contract(minERC20ABI, ercTokenAddress);
+    const method = contract.methods.transfer(receiver, appWeb3.utils.toWei(amount.toString()));
+    return this.ethereumService.sendSignedTransactionByMethodWithEvent(owner, ercTokenAddress, method, privateKey, networkId);
+  }
+
+  mintForMe(senderAddress: string, erc20Address: string, amount: number): Promise<any> {
     const appWeb3 = this.ethereumService.appWeb3;
     const contract = new appWeb3.eth.Contract(MockERC20TokenABI, erc20Address);
     const method = contract.methods.mintForMe(appWeb3.utils.toWei(amount.toString()));
