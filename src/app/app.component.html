@@ -26,6 +26,11 @@
               [disabled]="processing" (click)="sendToken()" type="button" class="btn btn-primary btn-block">
               Send
             </button>
+            <button
+              *ngIf="web3State === Web3State.Connected"
+              [disabled]="processing" (click)="registerToken()" type="button" class="btn btn-info btn-block">
+              Register NPT Token
+            </button>            
             <button *ngIf="web3State === Web3State.Installed" (click)="connectToWallet()" type="button"
               class="btn btn-lg btn-outline-danger btn-block">
               Connect to Wallet

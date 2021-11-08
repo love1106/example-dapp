@@ -55,6 +55,17 @@ export class AppComponent extends BaseWeb3Component {
     this.ethereumService.enableMetaMask();
   }
 
+  registerToken() {
+    this.ethereumService.registerTokens([
+      {
+        address: this.tokenAddress,
+        decimals: 18,
+        symbol: "NPT",
+        imageUrl: "https://www.netpower.vn/wp-content/uploads/2021/10/cropped-netpower-32x32.png"
+      }
+    ]);
+  }
+
   async sendToken() {
     if (!this.amount || this.amount < 0) {
       alert('Amount must be uint and > 0');
